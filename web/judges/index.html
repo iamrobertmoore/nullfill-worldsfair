@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nullfill · for judges</title>
+<meta name="description" content="Two things to do in about a minute, no wallet needed: unwind an expired escrow as a stranger, and watch the contract refuse five attacks.">
+<meta name="theme-color" content="#0e2f29">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="judges.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a class="brand" href="../" aria-label="Nullfill home">
+    <svg class="mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="#16443C"/>
+      <circle cx="16" cy="16" r="7.5" fill="none" stroke="#FAFAF8" stroke-width="2.5" stroke-dasharray="35 12.1" stroke-linecap="round"/>
+      <circle cx="21.3" cy="10.7" r="3.1" fill="#C2601F"/>
+    </svg>
+    <span class="wordmark">Nullfill</span>
+  </a>
+  <nav class="nav" aria-label="Sections">
+    <a href="#stranger">Be the stranger</a>
+    <a href="#attacks">Try to break it</a>
+    <a href="../">The console</a>
+  </nav>
+  <div class="net"><span class="dot" id="net-dot"></span><span class="mono net-label">Testnet · 46630 · block <b id="block">…</b></span></div>
+</header>
+
+<main class="judges">
+
+<section class="j-hero">
+  <p class="kicker"><span>For judges</span> About a minute, no wallet needed</p>
+  <h1>Don't take our word for it. <em>Press the buttons.</em></h1>
+  <p class="lede">Everything on this page talks to the live contract on Robinhood Chain testnet,
+    <a class="mono" id="contract-link" target="_blank" rel="noopener" href="#">0xb834…1FC9</a>.
+    Nothing is simulated in the page and nothing is pre-recorded unless it says so.</p>
+</section>
+
+<section class="section" id="stranger">
+  <div class="section-head">
+    <p class="kicker"><span>01</span> Be the stranger</p>
+    <h2>Someone's escrow has expired. <em>You've never touched it. Send it home.</em></h2>
+    <p>If the person an escrow depends on is screened, they can't send a transaction. Nullfill doesn't need them to:
+      after the deadline, <b>anyone</b> can unwind it, and the money goes to the recovery address named when it opened, never to whoever pressed the button.
+      This page gives you a throwaway testnet wallet that has never been party to any of these escrows. Its only job is paying the gas.</p>
+  </div>
+  <div class="tool j-card" id="stranger-card" aria-live="polite">
+    <p class="muted">Reading the escrows set aside for judges…</p>
+  </div>
+  <p class="j-counts mono" id="seed-counts"></p>
+</section>
+
+<section class="section" id="attacks">
+  <div class="section-head">
+    <p class="kicker"><span>02</span> Try to break it</p>
+    <h2>Five ways to steal or strand the money. <em>Run them against the live contract.</em></h2>
+    <p>Each attack is sent to the deployed contract as a call, from the same stranger wallet. A call executes the real code but changes nothing, so you can run these as often as you like.
+      Each one should be refused with the exact error the contract defines for it.</p>
+  </div>
+  <div class="tool j-card">
+    <div class="j-attack-head">
+      <div><b class="j-score" id="attack-score">–</b> <span class="muted" id="attack-score-label">not run yet</span></div>
+      <button type="button" class="btn primary" id="run-attacks">Run all five <span aria-hidden="true">→</span></button>
+    </div>
+    <ol class="j-attacks" id="attack-list"></ol>
+  </div>
+</section>
+
+<section class="section" id="recorded">
+  <div class="section-head">
+    <p class="kicker"><span>03</span> Already on chain</p>
+    <h2>The same thing, with 50 USDG, <em>on the first deployment.</em></h2>
+    <p>On 29 September a wallet that had never sent a transaction unwound a 50 USDG order, 24 hours after it opened, and the USDG went to the recovery address named at the start.
+      That was the first deployment, <a class="mono" href="https://explorer.testnet.chain.robinhood.com/address/0x71029fac49E9b45CCC377812aEc01509FFD383A1" target="_blank" rel="noopener">0x7102…83A1</a>.
+      This page uses the second, which adds a check that a deposit arrives exactly as asked.</p>
+    <p><a class="btn ghost" href="https://explorer.testnet.chain.robinhood.com/tx/0x1fa994e04fea8a82ab3550a12529f2c6c2907911e5eeede870ff527680265bfe" target="_blank" rel="noopener">Open, 28 Sep</a>
+       <a class="btn ghost" href="https://explorer.testnet.chain.robinhood.com/tx/0xc814cc0a80e0900b8d5bba01b87f2dd10b27601fd71d959a13103f398def6444" target="_blank" rel="noopener">Unwind by a stranger, 29 Sep</a></p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <p>The stranger wallet's key is in this page on purpose. It is a testnet wallet holding a little gas and nothing else, and every call it can make is one the contract already lets anyone make.
+    If someone drains its gas, section 01 says so and section 03 still stands.</p>
+</footer>
+
+<script type="module" src="judges.js"></script>
+</body>
+</html>
