@@ -152,21 +152,13 @@
   <div class="stakes-inner">
     <div class="section-head reveal">
       <p class="kicker light"><span>02</span> What's at stake</p>
-      <h2><b class="count" data-to="672.9" data-dec="1">672.9</b> million USDG sits on Robinhood Chain mainnet.</h2>
-      <p>Read from the token contract at block 74,889,519 on 28 September 2026. Every escrow, loan and payout holding it assumes a transaction either lands or reverts.</p>
+      <h2><b class="count" data-to="695.2" data-dec="1">695.2</b> million USDG sits on Robinhood Chain mainnet.</h2>
+      <p>Read from the token contract at block 84,062,048 on 9 October 2026, up from 672.9 million on 28 September. Every escrow, loan and payout holding it assumes a transaction either lands or reverts.</p>
     </div>
     <div class="measured reveal">
-      <b class="count" data-to="1355">1,355</b>
-      <p>transactions the compliance filter refused on Robinhood Chain mainnet between 30 June and 16 September 2026, counted from the chain's own registry at <code>0x74</code>. Every one I sampled was included and failed. And those are only the ones that came in through the delayed inbox. A transaction refused at the sequencer's door leaves no count at all.</p>
+      <b class="count" data-to="1402">1,402</b>
+      <p>transactions the compliance filter refused on Robinhood Chain mainnet between 30 June and 7 October 2026, counted from the chain's own registry at <code>0x74</code> on 9 October. It was 1,355 on 16 September. Every one I sampled was included and failed. And those are only the ones that came in through the delayed inbox. A transaction refused at the sequencer's door leaves no count at all.</p>
     </div>
-    <p class="survey-intro reveal">So I read the fund-holding contracts in this buildathon whose source I could find, one function at a time.</p>
-    <div class="survey">
-      <div class="stat reveal"><b class="count" data-to="8">8</b><span>contracts read</span></div>
-      <div class="stat reveal"><b class="count zero" data-to="0">0</b><span>handle a transaction rejected at the sequencer</span></div>
-      <div class="stat reveal"><b class="count" data-to="3">3</b><span>move money when a transaction misses a deadline</span></div>
-      <div class="stat reveal"><b class="count" data-to="2">2</b><span>let that deadline be shorter than 24 hours</span></div>
-    </div>
-    <p class="survey-note reveal">No project is named. They're other builders' entries, not bugs to air in public. The point is the pattern: on this chain, "no transaction arrived" gets treated as a decision, and it isn't one.</p>
   </div>
 </section>
 
@@ -176,8 +168,9 @@
     <p class="kicker"><span>03</span> Real USDG, through the live contract</p>
     <h2>Two orders, 50 USDG each. <em>Read from the chain as you look.</em></h2>
     <p>
-      From the Paxos testnet faucet, through the deployed escrow at
+      From the Paxos testnet faucet, through the first deployment at
       <a class="mono" href="https://explorer.testnet.chain.robinhood.com/address/0x71029fac49E9b45CCC377812aEc01509FFD383A1" target="_blank" rel="noopener">0x7102…83A1</a>.
+      The current deployment, with the exact-deposit guard, is where <a href="judges/">the judges' page</a> runs.
       The status on each card comes from the contract's own <code>describe()</code> when this page loads.
     </p>
   </div>
@@ -246,9 +239,9 @@ _orders[ref] = Order({ ..., unwindTo: recovery, ... });</code></pre>
     </article>
   </div>
   <p class="rules-foot reveal">
-    <a href="https://github.com/iamrobertmoore/Nullfill/blob/main/contracts/src/Nullfill.sol">Read the whole contract</a> ·
+    <a href="https://github.com/iamrobertmoore/nullfill-worldsfair/blob/main/contracts/src/Nullfill.sol">Read the whole contract</a> ·
     I broke it 14 ways on purpose and the tests caught 13. The one they missed now has its own test.
-    · <a href="https://github.com/iamrobertmoore/Nullfill/blob/main/docs/reproduction.md">Reproduce the screening on a local Nitro chain</a>
+    · <a href="https://github.com/iamrobertmoore/nullfill-worldsfair/blob/main/docs/reproduction.md">Reproduce the screening on a local Nitro chain</a>
   </p>
 </section>
 
@@ -336,7 +329,7 @@ node watch/nullfill-watch.mjs escrows --address 0x…</code></pre>
     <li><strong>Screening is only directly visible at submit time.</strong> If you didn't send it, you can't be certain it was screened rather than never sent.</li>
     <li><strong>The restricted list is private.</strong> Addresses are stored as salted hashes. Nothing here tries to reverse it.</li>
     <li><strong>Nullfill can't route around screening.</strong> Every transfer it makes is screened like any other. It changes who has to act, and when it's safe to act.</li>
-    <li><strong>The deployed escrow assumes exact-transfer tokens.</strong> USDG and the testnet stock tokens all are. The guard for fee-on-transfer tokens ships with the next deployment.</li>
+    <li><strong>The first deployment assumes exact-transfer tokens.</strong> USDG and the testnet stock tokens all are. The current deployment measures what arrives and refuses an escrow that comes up short.</li>
   </ul>
 </section>
 
@@ -345,15 +338,15 @@ node watch/nullfill-watch.mjs escrows --address 0x…</code></pre>
   <p>The Watch alpha is in the repo today: signed receipts for refused transactions, and every escrow's deadline for an address. The hosted version, with alerts and bridge-deposit matching, is $99 a month per desk.</p>
   <div class="cta-row">
     <a class="btn primary" href="deck/">Open the pitch deck <span aria-hidden="true">→</span></a>
-    <a class="btn ghost" href="https://github.com/iamrobertmoore/Nullfill">Read the code</a>
+    <a class="btn ghost" href="https://github.com/iamrobertmoore/nullfill-worldsfair">Read the code</a>
   </div>
 </section>
 
 </main>
 
 <footer class="site-footer">
-  <p>Nullfill, built by Robert Moore for the Arbitrum Open House Singapore online buildathon. Primary sources are quoted in the <a href="https://github.com/iamrobertmoore/Nullfill/blob/main/README.md">README</a>.</p>
-  <p>Deployed on Robinhood Chain testnet at <a href="https://explorer.testnet.chain.robinhood.com/address/0x71029fac49E9b45CCC377812aEc01509FFD383A1"><code>0x71029fac49E9b45CCC377812aEc01509FFD383A1</code></a>.</p>
+  <p>Nullfill, built by Robert Moore. First entered at Arbitrum Open House Singapore, continued for Colosseum's Crypto World's Fair. Primary sources are quoted in the <a href="https://github.com/iamrobertmoore/nullfill-worldsfair/blob/main/README.md">README</a>.</p>
+  <p>Deployed on Robinhood Chain testnet at <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9"><code>0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9</code></a> (current, 9 Oct) and <a href="https://explorer.testnet.chain.robinhood.com/address/0x71029fac49E9b45CCC377812aEc01509FFD383A1"><code>0x71029fac49E9b45CCC377812aEc01509FFD383A1</code></a> (first, 16 Sep).</p>
 </footer>
 
 <script type="module" src="app.js"></script>
