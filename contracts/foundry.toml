@@ -31,7 +31,7 @@ runs = 256
 #     forge test --match-path test/Fork.t.sol -vv
 #
 # The default stays Paris deliberately. The live Nullfill is Paris bytecode, it is verified working at
-# 0x71029fac49E9b45CCC377812aEc01509FFD383A1, and Paris bytecode runs on any chain at or above it.
+# 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9, and Paris bytecode runs on any chain at or above it.
 # Raising the deployment target would mean redeploying to gain nothing.
 [profile.fork]
 evm_version = "cancun"
