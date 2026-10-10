@@ -1,5 +1,7 @@
 <p align="center"><img src="docs/brand/readme-banner.svg" alt="Nullfill. Settlement that stays correct when a transaction never happens." width="1000"></p>
 
+<p align="center"><a href="https://iamrobertmoore.github.io/nullfill-worldsfair/judges/"><img src="docs/demo.gif" alt="The judges' page running attacks against the live Nullfill contract on Robinhood Chain testnet, each one refused with the contract's own error" width="800"></a></p>
+
 <p align="center"><strong>An escrow for tokenised equities that stays correct when a transfer is never sequenced at all.</strong></p>
 
 > **Where this came from.** I built Nullfill between 15 and 30 September 2026 and entered it in Arbitrum Open House Singapore ([the original entry](https://arbitrum-singapore.hackquest.io/projects/Nullfill), [its repo](https://github.com/iamrobertmoore/Nullfill), judging still in progress). This repository is the same project, continued for Colosseum's Crypto World's Fair, with the full commit history carried over. Everything up to 30 September is that entry; everything after is new here: the exact-deposit guard in a [new deployment](https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9), the [judges' page](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), and mainnet figures re-measured on 9 October. The original repo and contract are left exactly as that entry was judged.
