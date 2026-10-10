@@ -39,3 +39,6 @@
 .j-atk-title { font-weight: 600; }
 .j-atk-result { margin-top: 6px; font-size: 13px; }
 #recorded .btn { margin: 14px 8px 0 0; }
+.j-score-row { display: flex; gap: clamp(24px, 6vw, 72px); flex-wrap: wrap; align-items: baseline; }
+.j-score-row .j-score { font-size: clamp(36px, 6vw, 60px); color: var(--muted); }
+.j-score-row .good-score { color: var(--good); }

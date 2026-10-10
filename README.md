@@ -22,6 +22,19 @@ So when a settlement does not complete, Ines is left with a question she cannot 
 
 Both numbers in bold above are sourced rather than estimated. The zero is a property of the mechanism: the transaction is rejected before sequencing, so there is no receipt to find. The 24 hours is the Arbitrum force inclusion window, the period during which a transaction that was screened can still arrive by another route. Unwinding an escrow before that window closes is not caution, it is a bug, because the late arrival would settle on top of the refund.
 
+## Five outcomes, side by side
+
+The same five scenarios, run in [`test/Outcomes.t.sol`](contracts/test/Outcomes.t.sol) against the escrow most people would write first (funder releases, funder refunds after any deadline, no reference) and against Nullfill. The baseline is computed in that file, not observed in the wild.
+
+| Scenario | Ordinary escrow | Nullfill |
+|---|---|---|
+| Nothing goes wrong | correct | correct |
+| The desk is screened, then the trade fails | money stuck: only the desk could refund | sent home by a stranger to the nominated address |
+| The delivery is screened, then lands 20 hours later | refunded at hour 1, counterparty never paid | refund refused inside 24 hours, desk pays at hour 20 |
+| The open seems to vanish and is sent again | two deposits | one: the reference is already used |
+| The asset delivers one percent short | the first refund eats the second deposit | the escrow refuses to open |
+| **Correct outcomes** | **1 of 5** | **5 of 5** |
+
 ## Try this
 
 | Try this | Watch what happens |
@@ -158,7 +171,7 @@ git submodule update --init --recursive
 forge test
 ```
 
-46 tests, four of them fuzzed, all passing. I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it. Four more run against a live chain and report as **skipped** rather than passed when there is no RPC, which is deliberate: a network check that quietly reports success when it did not run reads as evidence.
+47 tests, four of them fuzzed, all passing. I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it. Four more run against a live chain and report as **skipped** rather than passed when there is no RPC, which is deliberate: a network check that quietly reports success when it did not run reads as evidence.
 
 ```bash
 FOUNDRY_PROFILE=fork ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Fork.t.sol
@@ -214,7 +227,8 @@ Every number and address above can be checked rather than believed. This table i
 | A deposit that comes up short is refused | `cd contracts && forge test --match-test FeeOnTransfer` | 1 passing: the escrow does not open |
 | USDG is at that address and is six decimals | `cast call 0x7E955252E15c84f5768B83c41a71F9eba181802F "decimals()(uint8)" --rpc-url https://rpc.testnet.chain.robinhood.com` | `6` |
 | Every address in the registry still matches the chain | `FOUNDRY_PROFILE=fork ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Fork.t.sol` | 3 passing |
-| The contract's own test suite | `cd contracts && forge test` | 46 passing, 4 skipped |
+| The contract's own test suite | `cd contracts && forge test` | 47 passing, 4 skipped |
+| Five outcomes, naive escrow against Nullfill | `cd contracts && forge test --match-path test/Outcomes.t.sol -vv` | `correct outcomes: naive 1 of 5, Nullfill 5` |
 | A real USDG order was unwound by a stranger (first deployment) | `cast call 0x71029fac49E9b45CCC377812aEc01509FFD383A1 "statusOf(bytes32)(uint8)" 0x7fb40dea2f7e756989161f233dc86cd0a83d6e98b9558c1e460e20d7a351cc90 --rpc-url https://rpc.testnet.chain.robinhood.com` | `3`, which is Unwound. The [unwind](https://explorer.testnet.chain.robinhood.com/tx/0xc814cc0a80e0900b8d5bba01b87f2dd10b27601fd71d959a13103f398def6444) was sent from `0xFE9A…0548`, and the 50 USDG sits at the recovery address `0x5565…ba11a`. |
 | A real USDG order settled (first deployment) | `cast call 0x71029fac49E9b45CCC377812aEc01509FFD383A1 "statusOf(bytes32)(uint8)" 0xfad69ced7f9b1bf95844435440a669de0644dfbf7a378f571f412529e599acee --rpc-url https://rpc.testnet.chain.robinhood.com` | `2`, which is Settled |
 | The console's own test suite | `cd web && npm test` | 26 passing |

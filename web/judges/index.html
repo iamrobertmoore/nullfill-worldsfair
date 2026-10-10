@@ -26,6 +26,7 @@
     <span class="wordmark">Nullfill</span>
   </a>
   <nav class="nav" aria-label="Sections">
+    <a href="#outcomes">The number</a>
     <a href="#stranger">Be the stranger</a>
     <a href="#attacks">Try to break it</a>
     <a href="../">The console</a>
@@ -41,6 +42,16 @@
   <p class="lede">Everything on this page talks to the live contract on Robinhood Chain testnet,
     <a class="mono" id="contract-link" target="_blank" rel="noopener" href="#">0xb834…1FC9</a>.
     Nothing is simulated in the page and nothing is pre-recorded unless it says so.</p>
+</section>
+
+<section class="section" id="outcomes">
+  <div class="section-head">
+    <p class="kicker"><span>00</span> The number</p>
+    <h2>Five things that go wrong on this chain. <em>An ordinary escrow gets 1 right. Nullfill gets 5.</em></h2>
+    <p>The same scenarios, run against the escrow most people would write first and against Nullfill: the desk is screened, a delivery lands late inside the 24 hour window, an open is retried, an asset delivers short, and the happy path.
+      The baseline is computed in <a href="https://github.com/iamrobertmoore/nullfill-worldsfair/blob/main/contracts/test/Outcomes.t.sol" target="_blank" rel="noopener"><code>test/Outcomes.t.sol</code></a>, not observed in the wild. Sections 01 and 02 let you check the live contract yourself.</p>
+  </div>
+  <div class="tool j-card j-score-row"><div><b class="j-score">1 of 5</b><span class="muted"> ordinary escrow</span></div><div><b class="j-score good-score">5 of 5</b><span class="muted"> Nullfill</span></div></div>
 </section>
 
 <section class="section" id="stranger">
