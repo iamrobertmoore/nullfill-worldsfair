@@ -4,11 +4,22 @@
 
 <p align="center"><strong>An escrow for tokenised equities that stays correct when a transfer is never sequenced at all.</strong></p>
 
+<p align="center"><a href="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml"><img src="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml/badge.svg" alt="Tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT licence"></a> <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9?tab=contract"><img src="https://img.shields.io/badge/source-verified%20on%20explorer-2ea44f" alt="Source verified on the explorer"></a></p>
+
+| | |
+|---|---|
+| **The problem** | Robinhood Chain screens transactions before they're sequenced. A screened one leaves nothing on chain, and for 24 hours nobody can tell blocked from late. Anything with a deadline can refund too early or strand funds. |
+| **The fix** | Three rules in a small escrow with no owner: anyone can unwind an expired escrow, the refund address is named up front, and no deadline can sit inside the 24 hour window. |
+| **The number** | Five things that go wrong on this chain, run against an ordinary escrow and against Nullfill: **1 of 5 correct against 5 of 5** ([the test](contracts/test/Outcomes.t.sol)). |
+| **Proof** | Live on Robinhood Chain testnet with real USDG, source verified on the explorer. [Press the buttons yourself](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), no wallet needed. |
+| **The business** | The escrow is free and MIT licensed. Nullfill Watch is the product: an independent record of refused transactions and a deadline view for every escrow a desk is in. Hosted, $99 a month per desk. |
+| **Status** | Solo, unaudited, demo amounts only. Continuing after the hackathon. |
+
 > **Where this came from.** I built Nullfill between 15 and 30 September 2026 and entered it in Arbitrum Open House Singapore ([the original entry](https://arbitrum-singapore.hackquest.io/projects/Nullfill), [its repo](https://github.com/iamrobertmoore/Nullfill), judging still in progress). This repository is the same project, continued for Colosseum's Crypto World's Fair, with the full commit history carried over. Everything up to 30 September is that entry; everything after is new here: the exact-deposit guard in a [new deployment](https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9), the [judges' page](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), and mainnet figures re-measured on 9 October. The original repo and contract are left exactly as that entry was judged.
 
 <p align="center"><a href="https://iamrobertmoore.github.io/nullfill-worldsfair/">Open the settlement console</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/#classifier">Classify a transaction</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/judges/">For judges: press the buttons</a> · <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9">Deployed contract</a> · <a href="contracts/src/Nullfill.sol">Read the contract</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/deck/">Pitch deck</a></p>
 
-Ines runs settlement at a six-person desk that quotes tokenised equities on Robinhood Chain. Trades settle in escrow: her desk puts up the stock tokens, the counterparty puts up the cash, and the contract releases both when the trade completes.
+*An illustration, not a customer:* Ines runs settlement at a six-person desk that quotes tokenised equities on Robinhood Chain. Trades settle in escrow: her desk puts up the stock tokens, the counterparty puts up the cash, and the contract releases both when the trade completes.
 
 The trouble is that on Robinhood Chain a submitted transaction has four possible fates, not two. Besides executing and reverting, it can be screened at the sequencer, in which case it is never sequenced at all. No revert, no receipt, no event, no gas. Her contract cannot see that anything was attempted. Neither can the counterparty, the indexer, or the auditor.
 
@@ -18,11 +29,13 @@ So when a settlement does not complete, Ines is left with a question she cannot 
 
 **A screened transfer leaves 0 bytes of on-chain trace, and the chain gives you 24 hours before you may treat it as gone.**
 
-**And it is not a small pool of money.** 695.2 million USDG sits on Robinhood Chain mainnet, read from the token contract at block 84,062,048 on 9 October 2026 (672.9 million on 28 September). Every escrow, loan and payout that holds it assumes a transaction either lands or reverts.
+**For context, the cash on the chain.** 695.2 million USDG sits on Robinhood Chain mainnet, read from the token contract at block 84,062,048 on 9 October 2026 (672.9 million on 28 September). That's not money at risk; it's the money that escrows, loans and payouts on this chain are written for, and they all assume a transaction either lands or reverts.
 
 **And the filter is switched on, on mainnet.** Robinhood Chain keeps a registry of the transactions its compliance filter refused, at the ArbOS precompile `0x74`, and anyone can read it. Between 30 June and 7 October 2026 it recorded 1,402 of them, across 6,143 registration events, read on 9 October. On 16 September the count was 1,355. Every one I sampled was included and failed, which is how a filtered transaction that comes in through the delayed inbox ends. And those are only the ones that took that route. A transaction refused at the sequencer's door isn't counted anywhere.
 
-Both numbers in bold above are sourced rather than estimated. The zero is a property of the mechanism: the transaction is rejected before sequencing, so there is no receipt to find. The 24 hours is the Arbitrum force inclusion window, the period during which a transaction that was screened can still arrive by another route. Unwinding an escrow before that window closes is not caution, it is a bug, because the late arrival would settle on top of the refund.
+**And the people who are refused keep trying.** Those 1,402 refusals came from just 23 addresses, and one address accounts for 993 of them. It tried to send the same 3.05 WETH 198 times. Reading the registry's transactions back (`python3 tools/count-filtered.py`, then the hashes through `eth_getTransactionByHash`) shows the pattern: a refused transaction looks like a late one, so it gets sent again. That is exactly why every Nullfill order is keyed by a reference that can only be used once.
+
+Both numbers in bold above are sourced rather than estimated. The zero is a property of the mechanism: the transaction is rejected before sequencing, so there is no receipt to find. The 24 hours is the Arbitrum force inclusion window, the period during which a transaction that was screened can still arrive by another route. Unwinding an escrow before that window closes is a bug, because the late arrival would settle on top of the refund.
 
 ## Five outcomes, side by side
 
@@ -64,7 +77,7 @@ This is not a hypothetical I invented. Robinhood Chain documents the behaviour i
 
 > Robinhood Chain maintains compliance standards through sequencer-level screening. While rare, this mechanism can influence smart-contract execution; for instance, any transaction associated with a sanctioned address will be excluded from inclusion. Standard read operations, such as `eth_call`, `eth_getLogs`, or balance queries, remain fully accessible and unaffected. Since a blocked transfer is never processed, it simply appears as though the event never occurred, ensuring indexers remain synchronized with the actual state.
 
-Read the last sentence again. It is offered as a reassurance, and for an indexer it is. For anyone holding funds in escrow it is the bug.
+That last sentence is a reassurance for an indexer. For anyone holding funds in escrow, it's the bug.
 
 The mechanism is Arbitrum's, introduced in ArbOS 61 and off by default. Robinhood turned it on, and their documentation links directly to Arbitrum's compliance filtering page. TRM Labs appears on the Robinhood Chain ecosystem page under Compliance and Risk Management, which is the same role Arbitrum's documentation names for the address list provider. So this is a mechanism with a named supplier, running on a live chain, described by both parties.
 
@@ -84,7 +97,7 @@ No contract can fix this, because the failure is on the other side of the bridge
 
 ## Nullfill Watch, alpha
 
-A screened transaction exists in exactly one place: the error the RPC returned to whoever sent it. Nothing on chain will ever record it. [`watch/`](watch/) keeps that record. No dependencies, Node 22.
+A transaction refused at the sequencer's door leaves no trace on chain; the first-hand record is the error the RPC returned to whoever sent it. [`watch/`](watch/) captures that error as a signed, timestamped receipt. Run by the desk, it's the desk's own record; the hosted version signs with an independent key, so a counterparty can check a receipt without trusting the desk. No dependencies, Node 22.
 
 ```bash
 node watch/nullfill-watch.mjs proxy --rpc https://rpc.testnet.chain.robinhood.com --port 8646
@@ -117,11 +130,11 @@ node watch/nullfill-watch.mjs filtered --rpc https://rpc.mainnet.chain.robinhood
 
 **Unwind is permissionless.** Anyone can release an expired escrow to the recovery address. This is the single most important decision in the contract. The conventional pattern, "if the seller has not delivered by the deadline I will send myself the money back", requires the funder to be able to send a transaction. If the funder is the screened party, they cannot, and the funds are stuck forever. Making recovery permissionless means it never depends on the person most likely to be blocked.
 
-**The recovery address is nominated before it is needed.** It is set when the escrow opens and can be changed while the escrow is still open. A desk whose primary address is restricted names a different address in advance, rather than discovering the problem when they can no longer transact.
+**The recovery address is nominated before it is needed.** It is set when the escrow opens and can be changed while the escrow is still open. It protects the honest party: if a counterparty is screened, or an operations wallet is down, the desk's funds still come home to an address it chose in advance. It never helps anyone get round the filter: an unwind is a transfer like any other, so it's screened like any other, and a refund to a restricted address simply never happens.
 
 **Both parties can settle, and the deadline only gates the refund.** If the beneficiary has been screened and cannot transact, the funder can still complete the settlement, and the tokens still go to the beneficiary. A late settlement is still a settlement, so settling remains available after the deadline. Only the refund is time gated.
 
-**Every deadline is at least 24 hours out.** The contract enforces this, because it is the force inclusion window. A screened transaction can still arrive through the delayed inbox during that period, and Arbitrum closes that route deliberately with the Transaction Guardian precompile: a restricted transaction that does arrive is forcibly failed on inclusion and burns its attached gas. So force inclusion is not an escape hatch. It is a way to spend gas learning that you are blocked.
+**Every deadline is at least 24 hours out.** The contract enforces this, because it is the force inclusion window. A screened transaction can still arrive through the delayed inbox during that period, and Arbitrum closes that route deliberately with the Transaction Guardian precompile: a restricted transaction that does arrive is forcibly failed on inclusion and burns its attached gas. So force inclusion only spends gas learning that you're blocked.
 
 ## The assets this settles
 
@@ -133,7 +146,7 @@ The contract is asset agnostic for any token that transfers exactly what it is a
 
 > Every micro-dollar that goes into a USDG escrow comes out again, to the unit, whichever way it leaves, and the escrow keeps nothing.
 
-Two limits, stated rather than discovered.
+Two limits.
 
 **Testnet USDG comes from the Paxos faucet, 100 per wallet per day.** The token itself has a role gated `mint` and no public one, so this project cannot create USDG, only receive it. The two orders above used faucet USDG. The unit tests use a six decimal stand-in that mirrors the real interface, and [`test/Fork.t.sol`](contracts/test/Fork.t.sol) reads the real contract on chain.
 
@@ -141,7 +154,7 @@ Two limits, stated rather than discovered.
 
 ## What this will not claim
 
-Six limits, stated here rather than discovered by a reviewer.
+Six limits.
 
 **The first deployment assumes the token transfers exactly.** The contract at `0x7102…83A1`, the one the two 50 USDG orders went through, records the amount it was asked to escrow without measuring what arrived. USDG and the five testnet equities all transfer exactly, so nothing it settled was affected. The current deployment, `0xb834…1FC9`, measures the balance delta and refuses an escrow that comes up short; [`test/RobinhoodChain.t.sol`](contracts/test/RobinhoodChain.t.sol) proves it with a token that keeps one percent of every transfer.
 
@@ -173,7 +186,7 @@ git submodule update --init --recursive
 forge test
 ```
 
-47 tests, four of them fuzzed, all passing. I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it. Four more run against a live chain and report as **skipped** rather than passed when there is no RPC, which is deliberate: a network check that quietly reports success when it did not run reads as evidence.
+47 tests pass, four of them fuzzed; four more need a live RPC and are skipped without one (see below). I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it. Four more run against a live chain and report as **skipped** rather than passed when there is no RPC, which is deliberate: a network check that quietly reports success when it did not run reads as evidence.
 
 ```bash
 FOUNDRY_PROFILE=fork ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Fork.t.sol
@@ -215,7 +228,7 @@ The mechanism is not mine. Arbitrum documents compliance filtering and Robinhood
 
 **What is new** is treating non-inclusion as a first class settlement outcome. Every escrow I know of assumes a submitted transaction either lands or reverts. This one handles the third case, where it never happened, and enforces the two things that follow: recovery must not depend on the screened party transacting, and no deadline may sit inside the force inclusion window.
 
-That is the claim. It is narrower than "nobody has thought about compliance on this chain", which would be false, and it is the one the code supports.
+That claim is narrower than "nobody has thought about compliance on this chain", which would be false, and it is the one the code supports.
 
 ## Checking every claim on this page
 
@@ -248,19 +261,7 @@ above name the skips rather than hiding them.
 
 ## Corrections
 
-Claims this repository published and then changed. Kept because a correction is more useful than a silent edit, and because the list is the honest measure of how much of the rest survived checking.
-
-**9 October 2026.** The exact-deposit guard held back on 28 September now ships, in a new deployment at `0xb834…1FC9`, with its bytecode checked against this source. The first deployment is left as it was.
-
-**29 September 2026.** This README said a failure receipt cannot tell you why it failed. For the filter's own refusals on mainnet, it can: the chain lists them at `0x74`, and the classifier now reads that list. The limit is rewritten above as what is still true, that a refusal at the sequencer's door leaves no record at all.
-
-**28 September 2026.** This README said the local reproduction was "written up in the repository history". It was not. No commit and no file mentioned it. The writeup now exists at [`docs/reproduction.md`](docs/reproduction.md), and the sentence points at it. The claim was true about the work and false about the record.
-
-**28 September 2026.** The test count above said 29. It was 29 when written and 44 by the time anyone read it, because a second test file was added. A count is only meaningful with a date attached, and it had none.
-
-**28 September 2026.** The deposit path accepts an amount without checking what arrived, so a fee on transfer token would leave one order able to spend another order's balance. Found while writing the USDG tests. I wrote the fix, a balance delta check, and then took it back out of this repository, because shipping it meant redeploying the contract in the last week of the buildathon and the repository would otherwise no longer match its own deployment. The limit is now stated under "What this will not claim", pinned by a test, and the fix ships with the next deployment.
-
-**28 September 2026.** An earlier version of this README said the route to testnet USDG was undocumented. It is documented: Paxos runs a testnet faucet that covers Robinhood Chain, 100 USDG per wallet per day. The two live orders above were funded from it.
+Every claim this repository published and then changed is listed, with dates, in [`docs/CORRECTIONS.md`](docs/CORRECTIONS.md).
 
 ## Who pays, and where this goes next
 
@@ -268,18 +269,18 @@ Claims this repository published and then changed. Kept because a correction is 
 
 **What stays free.** The escrow. It is MIT licensed, has no owner and no fee, and any team can deploy it or copy the three rules into their own contract: recovery never depends on one party transacting, the refund address is named up front, and no deadline sits inside the 24 hour window.
 
-**What I will charge for.** The watcher. The alpha is in the repo today (above); the hosted version is the product. A screened transaction exists in exactly one place, the error returned to whoever sent it, and nothing on chain will ever record it. The alpha already sits between a desk and the RPC, keeps that rejection as a signed, timestamped receipt, and lists every open escrow against its deadline. The hosted version adds alerts and matches parent chain bridge deposits against child chain credits; the bridge panel on the console today is a recorded example of what it looks for. **$99 a month per desk, up to 25 watched addresses**, with the classifier on this page free for everyone. What grows is the number of watched addresses, and it grows with the USDG on the chain.
+**What I will charge for.** The watcher. The alpha is in the repo today (above); the hosted version is the product. A transaction refused at the sequencer's door leaves nothing on chain; the only first-hand record is the error returned to whoever sent it. The alpha already sits between a desk and the RPC, keeps that rejection as a signed, timestamped receipt, and lists every open escrow against its deadline. The hosted version adds alerts and matches parent chain bridge deposits against child chain credits; the bridge panel on the console today is a recorded example of what it looks for. **$99 a month per desk, up to 25 watched addresses**, with the classifier on this page free for everyone. Hosted Watch signs receipts with its own key rather than the desk's, so a receipt is evidence a counterparty can check, not the desk's word. What grows is the number of watched addresses, and the market grows with every Arbitrum chain that switches screening on, not only this one.
 
 **Roadmap.**
 
 1. **Now.** Nullfill Watch alpha, in [`watch/`](watch/): signed receipts for refused transactions, and escrow deadlines per address.
 2. **9 October 2026, done.** v1.1 deployed with the exact-deposit guard. **Next:** hosted Watch with alerts.
 3. **November 2026.** Publish the three rules as a small Solidity library other settlement contracts can inherit, with the tests that prove each one.
-4. **Q1 2027.** External audit, then Robinhood Chain mainnet. Apply to the Arbitrum D.A.O. Grant Program, which funds exactly this kind of primitive: small, verifiable, and useful to other teams on the chain.
+4. **Q1 2027.** External audit before any size, then mainnet for real money. Apply to the Arbitrum D.A.O. Grant Program, which funds exactly this kind of primitive: small, verifiable, and useful to other teams on the chain.
 
 ## Sources
 
-Every claim above is quoted from a primary source, checked on 15 September 2026.
+The quotes above come from these pages, first read on 15 September 2026 and re-checked on 11 October. The mainnet figures were read on 9 October.
 
 - Robinhood Chain, [Differences from Ethereum](https://docs.robinhood.com/chain/differences-from-ethereum/), the Transaction screening section
 - Arbitrum, [Compliance filtering](https://docs.arbitrum.io/launch-arbitrum-chain/configure-your-chain/advanced/compliance-filtering), including the force inclusion protection and parent chain bridge deposit notes
