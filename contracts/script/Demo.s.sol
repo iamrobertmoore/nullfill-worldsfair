@@ -41,7 +41,7 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 contract Demo is Script {
     /// @dev The live deployment, Robinhood Chain testnet, deployed 16 September 2026. Overridable
     ///      with NULLFILL so the same script can drive a redeployment without being edited.
-    address internal constant DEFAULT_NULLFILL = 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9;
+    address internal constant DEFAULT_NULLFILL = 0x0503e528155c236f100efbf5A4A4A368C1fAFF99;
 
     error UnknownAction(string action);
     error NoFundedAsset(address wallet);

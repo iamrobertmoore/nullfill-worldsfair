@@ -2,7 +2,7 @@
 
 Claims this repository published and then changed. Kept because a correction is more useful than a silent edit, and because the list is the honest measure of how much of the rest survived checking.
 
-**11 October 2026.** An independent review pointed out that `extend()` is open to either party, so a beneficiary can keep pushing the deadline out and delay a refund. Nothing in the README said so. It is now the first item under "What this will not claim", and the fix, an extension that needs both parties, is the next contract change. The judges' page heading said "Five ways to steal or strand the money"; it did not cover this one, so it now says "Five attacks the contract refuses".
+**11 October 2026.** An independent review pointed out that `extend()` was open to either party, so a beneficiary could keep pushing the deadline out and hold off a refund. Nothing in the README said so. The same day it was disclosed, then fixed: v1.2 lets only the funder extend, with two tests pinning it, and is deployed on testnet at `0x0503…FF99` and mainnet at `0x2C96…e9a0`. That replaced two v1.1 deployments: testnet `0xb834…1FC9`, still live, and a mainnet deployment made earlier that day at `0xf675…28e0`, which never held any funds. The judges' page heading said "Five ways to steal or strand the money"; it did not cover this case, so it now says "Five attacks the contract refuses".
 
 **9 October 2026.** The exact-deposit guard held back on 28 September now ships, in a new deployment at `0xb834…1FC9`, with its bytecode checked against this source. The first deployment is left as it was.
 

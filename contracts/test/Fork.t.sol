@@ -29,7 +29,7 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 ///      Last run: 28 September 2026, all three passing, against Robinhood Chain testnet.
 contract ForkTest is Test {
     /// @dev The live deployment on Robinhood Chain testnet, deployed 16 September 2026.
-    address internal constant NULLFILL = 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9;
+    address internal constant NULLFILL = 0x0503e528155c236f100efbf5A4A4A368C1fAFF99;
 
     bool internal forked;
 

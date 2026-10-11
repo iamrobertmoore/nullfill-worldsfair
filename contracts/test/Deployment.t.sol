@@ -35,8 +35,8 @@ contract DeploymentTest is Test {
     /// @dev The live deployments. These constants are deliberately hardcoded: a check that reads the
     ///      address from the same place the documents do cannot catch the documents being wrong.
     ///      Point ROBINHOOD_RPC at either chain; the test picks the address by chain ID.
-    address internal constant TESTNET = 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9; // chain 46630
-    address internal constant MAINNET = 0xf6759537ADd77D1084d8ADC77e90b406eccE28e0; // chain 4663
+    address internal constant TESTNET = 0x0503e528155c236f100efbf5A4A4A368C1fAFF99; // chain 46630
+    address internal constant MAINNET = 0x2C964F8be4d8A43C71c974B51048dB6EBA2de9a0; // chain 4663
 
     address internal NULLFILL;
 

@@ -207,14 +207,17 @@ contract Nullfill is ReentrancyGuard {
 
     /// @notice Push the deadline out rather than let an in flight retry expire.
     /// @dev The scenario this exists for: a settlement transaction was screened, the parties want to
-    ///      retry, and the retry needs its own full force inclusion window. Callable by either party.
+    ///      retry, and the retry needs its own full force inclusion window.
+    /// @dev Funder only (v1.2). In v1.1 either party could extend, which let a beneficiary keep
+    ///      pushing the deadline out and hold off the unwind indefinitely: no gain to them, since
+    ///      they can settle at any time, but the funder's refund path could be blocked for good.
+    ///      Only the funder's money is waiting on the deadline, so only the funder may move it. A
+    ///      screened funder cannot extend at all, which is the point: the unwind then goes ahead.
     function extend(bytes32 ref, uint64 newDeadline) external {
         Order storage o = _orders[ref];
         if (o.status == Status.None) revert UnknownRef(ref);
         if (o.status != Status.Open) revert NotOpen(ref, o.status);
-        if (msg.sender != o.funder && msg.sender != o.beneficiary) {
-            revert NotAParty(ref, msg.sender);
-        }
+        if (msg.sender != o.funder) revert NotAParty(ref, msg.sender);
 
         uint64 earliest = uint64(block.timestamp) + FORCE_INCLUSION_WINDOW;
         if (newDeadline < earliest) revert DeadlineTooSoon(earliest);

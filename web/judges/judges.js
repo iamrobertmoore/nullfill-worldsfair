@@ -7,19 +7,17 @@ import {
 const RPC = 'https://rpc.testnet.chain.robinhood.com';
 const CHAIN_ID = 46630;
 const EXPLORER = 'https://explorer.testnet.chain.robinhood.com';
-export const NULLFILL = '0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9';
+export const NULLFILL = '0x0503e528155c236f100efbf5A4A4A368C1fAFF99';
 const USDG = '0x7E955252E15c84f5768B83c41a71F9eba181802F';
 const BENEFICIARY = '0xaAe247DC771532320050416d0e83BBe7220057D9';
 
 // A throwaway testnet gas wallet, published on purpose. See the footer of the page.
 const STRANGER_KEY = '0xe1be047200f8db33f80eead82c42a641e2e92a12590f88e2d42ceda73b966a7e';
 
-const SEEDED = [
-  ...Array.from({ length: 17 }, (_, i) => id(`nullfill-judges-${String(i + 1).padStart(2, '0')}`)),
-  // A second batch of 20, opened 11 October so the page keeps working through judging.
-  ...Array.from({ length: 20 }, (_, i) => id(`nullfill-judge-${i + 18}-1791799116`)),
-];
-const LONG = id('nullfill-judges-long'); // open until December, so "too early" is always testable
+// Escrows set aside for judges on v1.2, opened 11 October 2026 with deadlines on 12 October.
+const SEEDED = Array.from({ length: 24 }, (_, i) => id(`nullfill-v12-judges-${String(i + 1).padStart(2, '0')}`));
+const LONG = id('nullfill-v12-judges-long'); // open until December, so "too early" is always testable
+const CLOSED = id('nullfill-v12-judges-closed'); // opened and settled at once, so "already closed" is always testable
 
 const ABI = [
   'function describe(bytes32) view returns (uint8 status, address funder, address beneficiary, address unwindTo, address token, uint256 amount, uint64 deadline, bool unwindable)',
@@ -197,7 +195,7 @@ async function runAttacks() {
   const btn = $('#run-attacks');
   btn.disabled = true;
   const now = (await provider.getBlock('latest')).timestamp;
-  const closed = seeded.find((o) => o.status === 'Unwound' || o.status === 'Settled')?.ref;
+  const closed = seeded.find((o) => o.status === 'Unwound' || o.status === 'Settled')?.ref ?? CLOSED;
   const list = attacks(now, closed);
   const ol = $('#attack-list');
   ol.innerHTML = list.map((a, i) => `<li id="atk-${i}"><div class="j-atk-title">${a.title}</div><div class="muted">${a.why}</div><div class="j-atk-result mono">running…</div></li>`).join('');

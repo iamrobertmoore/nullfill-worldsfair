@@ -271,13 +271,32 @@ contract NullfillTest is Test {
         nullfill.unwind(REF);
     }
 
-    function test_Extend_BeneficiaryCanAlsoExtend() public {
+    /// v1.2: the beneficiary cannot move the deadline. In v1.1 they could, and could therefore push it
+    /// out forever and block the funder's refund.
+    function test_Extend_RevertsForBeneficiary() public {
         uint64 deadline = _open();
 
         vm.prank(beneficiary);
-        nullfill.extend(REF, deadline + 1 hours);
+        vm.expectRevert(abi.encodeWithSelector(Nullfill.NotAParty.selector, REF, beneficiary));
+        nullfill.extend(REF, type(uint64).max);
 
-        assertEq(nullfill.orderOf(REF).deadline, deadline + 1 hours);
+        assertEq(nullfill.orderOf(REF).deadline, deadline);
+    }
+
+    /// The case the v1.2 change exists for: a beneficiary who wants to strand the refund cannot, and a
+    /// stranger still sends the money home once the deadline passes.
+    function test_Extend_BeneficiaryCannotStrandTheRefund() public {
+        uint64 deadline = _open();
+
+        vm.prank(beneficiary);
+        vm.expectRevert(abi.encodeWithSelector(Nullfill.NotAParty.selector, REF, beneficiary));
+        nullfill.extend(REF, type(uint64).max);
+
+        vm.warp(deadline);
+        vm.prank(stranger);
+        nullfill.unwind(REF);
+
+        assertEq(uint8(nullfill.statusOf(REF)), uint8(Nullfill.Status.Unwound));
     }
 
     function test_Extend_RevertsForStranger() public {
