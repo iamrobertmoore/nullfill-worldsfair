@@ -14,7 +14,11 @@ const BENEFICIARY = '0xaAe247DC771532320050416d0e83BBe7220057D9';
 // A throwaway testnet gas wallet, published on purpose. See the footer of the page.
 const STRANGER_KEY = '0xe1be047200f8db33f80eead82c42a641e2e92a12590f88e2d42ceda73b966a7e';
 
-const SEEDED = Array.from({ length: 17 }, (_, i) => id(`nullfill-judges-${String(i + 1).padStart(2, '0')}`));
+const SEEDED = [
+  ...Array.from({ length: 17 }, (_, i) => id(`nullfill-judges-${String(i + 1).padStart(2, '0')}`)),
+  // A second batch of 20, opened 11 October so the page keeps working through judging.
+  ...Array.from({ length: 20 }, (_, i) => id(`nullfill-judge-${i + 18}-1791799116`)),
+];
 const LONG = id('nullfill-judges-long'); // open until December, so "too early" is always testable
 
 const ABI = [
