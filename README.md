@@ -10,8 +10,8 @@
 |---|---|
 | **The problem** | Robinhood Chain screens transactions before they're sequenced. A screened one leaves nothing on chain, and for 24 hours nobody can tell blocked from late. Anything with a deadline can refund too early or strand funds. |
 | **The fix** | Three rules in a small escrow with no owner: anyone can unwind an expired escrow, the refund address is named up front, and no deadline can sit inside the 24 hour window. |
-| **The number** | Five things that go wrong on this chain, run against an ordinary escrow and against Nullfill: **1 of 5 correct against 5 of 5** ([the test](contracts/test/Outcomes.t.sol)). |
-| **Proof** | Deployed on Robinhood Chain mainnet ([`0xf675…28e0`](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract)), the same bytecode as testnet, source verified on both explorers. Live on testnet with real USDG: [press the buttons yourself](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), no wallet needed. |
+| **The number** | Five scenarios on this chain, from a clean settle to a screened party, run against an ordinary escrow and against Nullfill: **1 of 5 handled correctly against 5 of 5** ([the test](contracts/test/Outcomes.t.sol)). |
+| **Proof** | Deployed on Robinhood Chain mainnet ([`0xf675…28e0`](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract)), the same bytecode as testnet, source verified on both explorers. On testnet its first version settled and unwound two 50 USDG orders (Paxos faucet USDG): [press the buttons yourself](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), no wallet needed. |
 | **The business** | The escrow is free and MIT licensed. Nullfill Watch is the product: an independent record of refused transactions and a deadline view for every escrow a desk is in. Hosted, $99 a month per desk. |
 | **Status** | Solo and unaudited. On mainnet with nothing escrowed yet; demo amounts on testnet. Continuing after the hackathon. |
 
@@ -154,7 +154,9 @@ Two limits.
 
 ## What this will not claim
 
-Six limits.
+Seven limits.
+
+**Either party can extend an escrow, so a beneficiary can delay a refund.** `extend()` lets the funder or the beneficiary push the deadline out, as long as it stays at least 24 hours ahead. That suits the usual case, where both sides want more time. It also means a beneficiary can keep pushing the deadline and hold off the unwind, leaving the funder to choose between settling and waiting. The fix is that an extension needs both parties, which a screened funder simply cannot give, so the unwind goes ahead. It is the next contract change (see the roadmap), and because it changes the bytecode it ships as a new deployment, not a quiet edit.
 
 **The first deployment assumes the token transfers exactly.** The contract at `0x7102…83A1`, the one the two 50 USDG orders went through, records the amount it was asked to escrow without measuring what arrived. USDG and the five testnet equities all transfer exactly, so nothing it settled was affected. The current deployment, `0xb834…1FC9`, measures the balance delta and refuses an escrow that comes up short; [`test/RobinhoodChain.t.sol`](contracts/test/RobinhoodChain.t.sol) proves it with a token that keeps one percent of every transfer.
 
@@ -186,7 +188,7 @@ git submodule update --init --recursive
 forge test
 ```
 
-47 tests pass, four of them fuzzed; four more need a live RPC and are skipped without one (see below). I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it. Four more run against a live chain and report as **skipped** rather than passed when there is no RPC, which is deliberate: a network check that quietly reports success when it did not run reads as evidence.
+47 tests pass, four of them fuzzed; four more need a live RPC and report as **skipped** rather than passed without one, which is deliberate: a network check that quietly reports success when it did not run reads as evidence. I also mutated the contract fourteen ways, one change at a time: removing the deadline check, letting only the funder unwind, sending the refund to the funder instead of the nominated address, and so on. Thirteen were caught by at least one test. The one that survived was halving the 24 hour window, because every test read the window from the contract instead of stating it. There is now a test that states it.
 
 ```bash
 FOUNDRY_PROFILE=fork ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Fork.t.sol
@@ -262,9 +264,7 @@ Every number and address above can be checked rather than believed. This table i
 | The screening behaviour is real | [`docs/reproduction.md`](docs/reproduction.md), run the command in it | `-32000 Transaction rejected by chain policy` |
 | The quotes are the chain's words | The four links under Sources | Each quote appears on the page linked |
 
-Two of those rows are skipped rather than passed when there is no RPC, and one of them is the row that
-matters most. A check that reports success when it did not run is worse than no check, so the counts
-above name the skips rather than hiding them.
+Without an RPC, four tests (one in Deployment, three in Fork) report as skipped, not passed, and the Deployment one is the check that matters most. A check that reports success when it did not run is worse than no check, so the counts above name the skips rather than hiding them.
 
 ## Corrections
 
@@ -282,12 +282,12 @@ Every claim this repository published and then changed is listed, with dates, in
 
 1. **Now.** Nullfill Watch alpha, in [`watch/`](watch/): signed receipts for refused transactions, and escrow deadlines per address.
 2. **9 and 11 October 2026, done.** v1.1 deployed with the exact-deposit guard, on testnet and then on mainnet from the same source. **Next:** hosted Watch with alerts.
-3. **November 2026.** Publish the three rules as a small Solidity library other settlement contracts can inherit, with the tests that prove each one.
+3. **November 2026.** v1.2: an extension needs both parties (see the limits above). Then publish the three rules as a small Solidity library other settlement contracts can inherit, with the tests that prove each one.
 4. **Q1 2027.** External audit, then real money through the mainnet contract. Apply to the Arbitrum D.A.O. Grant Program, which funds exactly this kind of primitive: small, verifiable, and useful to other teams on the chain.
 
 ## Sources
 
-The quotes above come from these pages, first read on 15 September 2026 and re-checked on 11 October. The mainnet figures were read on 9 October.
+The quotes above come from these pages, first read on 15 September 2026 and re-checked on 11 October. The mainnet figures were read on 9 October, and the sender counts on 11 October.
 
 - Robinhood Chain, [Differences from Ethereum](https://docs.robinhood.com/chain/differences-from-ethereum/), the Transaction screening section
 - Arbitrum, [Compliance filtering](https://docs.arbitrum.io/launch-arbitrum-chain/configure-your-chain/advanced/compliance-filtering), including the force inclusion protection and parent chain bridge deposit notes

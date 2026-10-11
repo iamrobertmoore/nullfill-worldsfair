@@ -2,6 +2,8 @@
 
 Claims this repository published and then changed. Kept because a correction is more useful than a silent edit, and because the list is the honest measure of how much of the rest survived checking.
 
+**11 October 2026.** An independent review pointed out that `extend()` is open to either party, so a beneficiary can keep pushing the deadline out and delay a refund. Nothing in the README said so. It is now the first item under "What this will not claim", and the fix, an extension that needs both parties, is the next contract change. The judges' page heading said "Five ways to steal or strand the money"; it did not cover this one, so it now says "Five attacks the contract refuses".
+
 **9 October 2026.** The exact-deposit guard held back on 28 September now ships, in a new deployment at `0xb834…1FC9`, with its bytecode checked against this source. The first deployment is left as it was.
 
 **29 September 2026.** This README said a failure receipt cannot tell you why it failed. For the filter's own refusals on mainnet, it can: the chain lists them at `0x74`, and the classifier now reads that list. The limit is rewritten above as what is still true, that a refusal at the sequencer's door leaves no record at all.
