@@ -4,20 +4,20 @@
 
 <p align="center"><strong>An escrow for tokenised equities that stays correct when a transfer is never sequenced at all.</strong></p>
 
-<p align="center"><a href="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml"><img src="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml/badge.svg" alt="Tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT licence"></a> <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9?tab=contract"><img src="https://img.shields.io/badge/source-verified%20on%20explorer-2ea44f" alt="Source verified on the explorer"></a></p>
+<p align="center"><a href="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml"><img src="https://github.com/iamrobertmoore/nullfill-worldsfair/actions/workflows/tests.yml/badge.svg" alt="Tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT licence"></a> <a href="https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract"><img src="https://img.shields.io/badge/mainnet-source%20verified-2ea44f" alt="Source verified on Robinhood Chain mainnet"></a></p>
 
 | | |
 |---|---|
 | **The problem** | Robinhood Chain screens transactions before they're sequenced. A screened one leaves nothing on chain, and for 24 hours nobody can tell blocked from late. Anything with a deadline can refund too early or strand funds. |
 | **The fix** | Three rules in a small escrow with no owner: anyone can unwind an expired escrow, the refund address is named up front, and no deadline can sit inside the 24 hour window. |
 | **The number** | Five things that go wrong on this chain, run against an ordinary escrow and against Nullfill: **1 of 5 correct against 5 of 5** ([the test](contracts/test/Outcomes.t.sol)). |
-| **Proof** | Live on Robinhood Chain testnet with real USDG, source verified on the explorer. [Press the buttons yourself](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), no wallet needed. |
+| **Proof** | Deployed on Robinhood Chain mainnet ([`0xf675…28e0`](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract)), the same bytecode as testnet, source verified on both explorers. Live on testnet with real USDG: [press the buttons yourself](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), no wallet needed. |
 | **The business** | The escrow is free and MIT licensed. Nullfill Watch is the product: an independent record of refused transactions and a deadline view for every escrow a desk is in. Hosted, $99 a month per desk. |
-| **Status** | Solo, unaudited, demo amounts only. Continuing after the hackathon. |
+| **Status** | Solo and unaudited. On mainnet with nothing escrowed yet; demo amounts on testnet. Continuing after the hackathon. |
 
-> **Where this came from.** I built Nullfill between 15 and 30 September 2026 and entered it in Arbitrum Open House Singapore ([the original entry](https://arbitrum-singapore.hackquest.io/projects/Nullfill), [its repo](https://github.com/iamrobertmoore/Nullfill), judging still in progress). This repository is the same project, continued for Colosseum's Crypto World's Fair, with the full commit history carried over. Everything up to 30 September is that entry; everything after is new here: the exact-deposit guard in a [new deployment](https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9), the [judges' page](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), and mainnet figures re-measured on 9 October. The original repo and contract are left exactly as that entry was judged.
+> **Where this came from.** I built Nullfill between 15 and 30 September 2026 and entered it in Arbitrum Open House Singapore ([the original entry](https://arbitrum-singapore.hackquest.io/projects/Nullfill), [its repo](https://github.com/iamrobertmoore/Nullfill), judging still in progress). This repository is the same project, continued for Colosseum's Crypto World's Fair, with the full commit history carried over. Everything up to 30 September is that entry; everything after is new here: the [mainnet deployment](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0), the exact-deposit guard in a [new testnet deployment](https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9), the [judges' page](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/), and mainnet figures re-measured on 9 October. The original repo and contract are left exactly as that entry was judged.
 
-<p align="center"><a href="https://iamrobertmoore.github.io/nullfill-worldsfair/">Open the settlement console</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/#classifier">Classify a transaction</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/judges/">For judges: press the buttons</a> · <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9">Deployed contract</a> · <a href="contracts/src/Nullfill.sol">Read the contract</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/deck/">Pitch deck</a></p>
+<p align="center"><a href="https://iamrobertmoore.github.io/nullfill-worldsfair/">Open the settlement console</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/#classifier">Classify a transaction</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/judges/">For judges: press the buttons</a> · <a href="https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0">Mainnet contract</a> · <a href="https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9">Testnet contract</a> · <a href="contracts/src/Nullfill.sol">Read the contract</a> · <a href="https://iamrobertmoore.github.io/nullfill-worldsfair/deck/">Pitch deck</a></p>
 
 *An illustration, not a customer:* Ines runs settlement at a six-person desk that quotes tokenised equities on Robinhood Chain. Trades settle in escrow: her desk puts up the stock tokens, the counterparty puts up the cash, and the contract releases both when the trade completes.
 
@@ -198,7 +198,10 @@ There is one more check, and it is the one that matters most. It asserts that th
 
 ```bash
 ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Deployment.t.sol
+ROBINHOOD_RPC=https://rpc.mainnet.chain.robinhood.com forge test --match-path test/Deployment.t.sol
 ```
+
+The test picks the recorded address by chain ID, so the same command checks both deployments.
 
 Run it under the default profile, not the fork profile, so the comparison is against the bytecode this project actually deploys.
 
@@ -211,6 +214,8 @@ cd contracts && forge script script/Deploy.s.sol:DeployNullfill --rpc-url https:
 The contract takes no constructor arguments and has no owner. A deployment is just the bytecode, and there is nothing to configure afterwards.
 
 It is live on Robinhood Chain testnet at [`0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9`](https://explorer.testnet.chain.robinhood.com/address/0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9), deployed on 9 October 2026 with the exact-deposit guard. `FORCE_INCLUSION_WINDOW()` returns `86400`, and `statusOf()` on an unknown reference returns `0`. The first deployment, [`0x71029fac49E9b45CCC377812aEc01509FFD383A1`](https://explorer.testnet.chain.robinhood.com/address/0x71029fac49E9b45CCC377812aEc01509FFD383A1), is still live and still holds the record of the two 50 USDG orders.
+
+On mainnet it is at [`0xf6759537ADd77D1084d8ADC77e90b406eccE28e0`](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract), deployed on 11 October 2026 from the same source. The runtime bytecode hashes to the same value on both chains, and the source is verified on the mainnet explorer as an exact match. Nothing is escrowed in it yet: it is unaudited, and real money waits for the audit.
 
 To drive one real order against that deployment, [`script/Demo.s.sol`](contracts/script/Demo.s.sol) takes one environment variable per step:
 
@@ -237,6 +242,7 @@ Every number and address above can be checked rather than believed. This table i
 | Claim | How to check it | What you should see |
 |---|---|---|
 | **The deployment is this source** | `ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com forge test --match-path test/Deployment.t.sol` | 2 passing. This compares the bytecode on chain against what the repository compiles to, and it fails loudly if they diverge. |
+| **The mainnet deployment is this source too** | `ROBINHOOD_RPC=https://rpc.mainnet.chain.robinhood.com forge test --match-path test/Deployment.t.sol` | 2 passing, against [`0xf675…28e0`](https://robinhoodchain.blockscout.com/address/0xf6759537ADd77D1084d8ADC77e90b406eccE28e0?tab=contract) |
 | The contract is deployed and the window is 24 hours | `cast call 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9 "FORCE_INCLUSION_WINDOW()(uint64)" --rpc-url https://rpc.testnet.chain.robinhood.com` | `86400` |
 | The judges' page runs against the live contract | Open [the judges' page](https://iamrobertmoore.github.io/nullfill-worldsfair/judges/) and press **Run all five** | Each attack refused, with the contract's own error name |
 | A deposit that comes up short is refused | `cd contracts && forge test --match-test FeeOnTransfer` | 1 passing: the escrow does not open |
@@ -275,9 +281,9 @@ Every claim this repository published and then changed is listed, with dates, in
 **Roadmap.**
 
 1. **Now.** Nullfill Watch alpha, in [`watch/`](watch/): signed receipts for refused transactions, and escrow deadlines per address.
-2. **9 October 2026, done.** v1.1 deployed with the exact-deposit guard. **Next:** hosted Watch with alerts.
+2. **9 and 11 October 2026, done.** v1.1 deployed with the exact-deposit guard, on testnet and then on mainnet from the same source. **Next:** hosted Watch with alerts.
 3. **November 2026.** Publish the three rules as a small Solidity library other settlement contracts can inherit, with the tests that prove each one.
-4. **Q1 2027.** External audit before any size, then mainnet for real money. Apply to the Arbitrum D.A.O. Grant Program, which funds exactly this kind of primitive: small, verifiable, and useful to other teams on the chain.
+4. **Q1 2027.** External audit, then real money through the mainnet contract. Apply to the Arbitrum D.A.O. Grant Program, which funds exactly this kind of primitive: small, verifiable, and useful to other teams on the chain.
 
 ## Sources
 

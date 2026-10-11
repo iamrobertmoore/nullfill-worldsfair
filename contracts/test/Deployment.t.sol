@@ -21,6 +21,8 @@ import {Test} from "forge-std/Test.sol";
 ///
 ///        ROBINHOOD_RPC=https://rpc.testnet.chain.robinhood.com \
 ///          forge test --match-path test/Deployment.t.sol
+///        ROBINHOOD_RPC=https://rpc.mainnet.chain.robinhood.com \
+///          forge test --match-path test/Deployment.t.sol
 ///
 ///      The default profile is the one the contract is deployed with. Running it under `fork` would
 ///      compile this source for Cancun and compare Cancun bytecode against a Paris deployment, which
@@ -30,9 +32,13 @@ import {Test} from "forge-std/Test.sol";
 ///      `EvmError: NotActivated` problem that `Fork.t.sol` hits when it calls a live token. That is
 ///      why it can run under Paris at all.
 contract DeploymentTest is Test {
-    /// @dev The live deployment. This constant is deliberately hardcoded: a check that reads the
+    /// @dev The live deployments. These constants are deliberately hardcoded: a check that reads the
     ///      address from the same place the documents do cannot catch the documents being wrong.
-    address internal constant NULLFILL = 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9;
+    ///      Point ROBINHOOD_RPC at either chain; the test picks the address by chain ID.
+    address internal constant TESTNET = 0xb834a2dfe813beABb4b515F63caBc81ab1DF1FC9; // chain 46630
+    address internal constant MAINNET = 0xf6759537ADd77D1084d8ADC77e90b406eccE28e0; // chain 4663
+
+    address internal NULLFILL;
 
     bool internal forked;
 
@@ -41,6 +47,9 @@ contract DeploymentTest is Test {
         if (bytes(rpc).length == 0) return;
         vm.createSelectFork(rpc);
         forked = true;
+        if (block.chainid == 4663) NULLFILL = MAINNET;
+        else if (block.chainid == 46630) NULLFILL = TESTNET;
+        else revert("ROBINHOOD_RPC is neither Robinhood Chain mainnet nor testnet");
     }
 
     function test_Deployment_BytecodeMatchesThisSource() public {
