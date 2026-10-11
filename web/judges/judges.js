@@ -14,8 +14,10 @@ const BENEFICIARY = '0xaAe247DC771532320050416d0e83BBe7220057D9';
 // A throwaway testnet gas wallet, published on purpose. See the footer of the page.
 const STRANGER_KEY = '0xe1be047200f8db33f80eead82c42a641e2e92a12590f88e2d42ceda73b966a7e';
 
-// Escrows set aside for judges on v1.2, opened 11 October 2026 with deadlines on 12 October.
-const SEEDED = Array.from({ length: 24 }, (_, i) => id(`nullfill-v12-judges-${String(i + 1).padStart(2, '0')}`));
+// Escrows set aside for judges on v1.2, opened 11 October 2026 with deadlines on 12 October:
+// three of 2 USDG (25 to 27), then twenty-four of 1 USDG (01 to 24).
+const SEEDED = [25, 26, 27, ...Array.from({ length: 24 }, (_, i) => i + 1)]
+  .map((n) => id(`nullfill-v12-judges-${String(n).padStart(2, '0')}`));
 const LONG = id('nullfill-v12-judges-long'); // open until December, so "too early" is always testable
 const CLOSED = id('nullfill-v12-judges-closed'); // opened and settled at once, so "already closed" is always testable
 
