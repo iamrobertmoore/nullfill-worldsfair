@@ -33,7 +33,7 @@ So when a settlement does not complete, Ines is left with a question she cannot 
 
 **And the filter is switched on, on mainnet.** Robinhood Chain keeps a registry of the transactions its compliance filter refused, at the ArbOS precompile `0x74`, and anyone can read it. Between 30 June and 7 October 2026 it recorded 1,402 of them, across 6,143 registration events, read on 9 October. On 16 September the count was 1,355. Every one I sampled was included and failed, which is how a filtered transaction that comes in through the delayed inbox ends. And those are only the ones that took that route. A transaction refused at the sequencer's door isn't counted anywhere.
 
-**And the people who are refused keep trying.** Those 1,402 refusals came from just 23 addresses, and one address accounts for 993 of them. It tried to send the same 3.05 WETH 198 times. Reading the registry's transactions back (`python3 tools/count-filtered.py`, then the hashes through `eth_getTransactionByHash`) shows the pattern: a refused transaction looks like a late one, so it gets sent again. That is exactly why every Nullfill order is keyed by a reference that can only be used once.
+**And the people who are refused keep trying.** Reading those transactions back (`python3 tools/who-was-refused.py`) shows 1,400 of the 1,402 came from just 23 addresses, and one address sent 993 of them. One identical token transfer, same sender, same recipient, same amount, was sent 163 times. A refused transaction looks like a late one, so it gets sent again. That is exactly why every Nullfill order is keyed by a reference that can only be used once.
 
 Both numbers in bold above are sourced rather than estimated. The zero is a property of the mechanism: the transaction is rejected before sequencing, so there is no receipt to find. The 24 hours is the Arbitrum force inclusion window, the period during which a transaction that was screened can still arrive by another route. Unwinding an escrow before that window closes is a bug, because the late arrival would settle on top of the refund.
 
@@ -248,6 +248,7 @@ Every number and address above can be checked rather than believed. This table i
 | A real USDG order settled (first deployment) | `cast call 0x71029fac49E9b45CCC377812aEc01509FFD383A1 "statusOf(bytes32)(uint8)" 0xfad69ced7f9b1bf95844435440a669de0644dfbf7a378f571f412529e599acee --rpc-url https://rpc.testnet.chain.robinhood.com` | `2`, which is Settled |
 | The console's own test suite | `cd web && npm test` | 26 passing |
 | Mainnet's filter has refused 1,402 transactions | `python3 tools/count-filtered.py` | 1,402 distinct transactions on 9 October 2026. It only goes up. |
+| 23 addresses sent them; one sent 993; one transfer was retried 163 times | `python3 tools/who-was-refused.py` | Run on 11 October 2026. Prints counts only, no addresses. |
 | Mainnet's filter refused a real transfer | `cast call 0x0000000000000000000000000000000000000074 "isTransactionFiltered(bytes32)(bool)" 0x3557fe4ab79553ae32f49af938d6596335aa42d68742bdfc73490d2261e3dbf5 --rpc-url https://rpc.mainnet.chain.robinhood.com` | `true`. The receipt for that hash shows it included and failed. |
 | The watcher's test suite | `cd watch && npm test` | 5 passing |
 | A real refusal, signed and checkable | `node watch/nullfill-watch.mjs verify web/data/sample-receipt.json` | three `ok` lines |
